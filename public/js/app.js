@@ -21,6 +21,8 @@ let verifyData = null;
 let lastConnectionKey = null;
 let scanInProgress = false;
 
+const STORAGE_KEY = 'latency-lab-results';
+
 function connectionKey(data) {
   const t = data?.client?.type || '';
   const k = data?.network?.connection?.kind || '';
@@ -37,6 +39,7 @@ async function refreshVerification() {
   initNetworkBanner(verifyData);
 
   if (changed) {
+    clearPersistedResults();
     summaryEl.classList.add('hidden');
     progressBar.style.width = '0%';
     progressText.textContent = 'Подключение изменилось — запустите проверку снова';
@@ -186,6 +189,72 @@ function buildCatalog() {
   ];
 }
 
+function hasCheckedResults(results) {
+  return results.some((r) => r.status === 'ok' || r.status === 'blocked');
+}
+
+function clearPersistedResults() {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+function loadPersistedResultsRaw() {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function loadPersistedResults() {
+  const data = loadPersistedResultsRaw();
+  if (!data?.results?.length) return null;
+  if (data.connectionKey !== lastConnectionKey) return null;
+  return data;
+}
+
+function persistResults(scanCompleted = null) {
+  try {
+    if (!hasCheckedResults(allResults)) {
+      clearPersistedResults();
+      return;
+    }
+    const existing = loadPersistedResultsRaw();
+    const completed = scanCompleted ?? existing?.scanCompleted ?? false;
+    sessionStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        connectionKey: lastConnectionKey,
+        results: allResults.map((r) => ({
+          url: r.url,
+          region: r.region,
+          status: r.status === 'checking' ? 'pending' : r.status,
+          latency: r.latency,
+        })),
+        scanCompleted: completed,
+      }),
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
+function mergeCatalogWithPersisted(savedResults) {
+  const map = new Map(
+    savedResults
+      .filter((r) => r.status === 'ok' || r.status === 'blocked')
+      .map((r) => [r.region + '|' + r.url, r]),
+  );
+  return buildCatalog().map((item) => {
+    const saved = map.get(item.region + '|' + item.url);
+    return saved ? { ...item, status: saved.status, latency: saved.latency } : item;
+  });
+}
+
 function findResultIndex(url, region) {
   return allResults.findIndex((r) => r.url === url && r.region === region);
 }
@@ -196,9 +265,24 @@ function mergeBatchResults(batch) {
     if (idx >= 0) allResults[idx] = result;
     else allResults.push(result);
   }
+  persistResults();
 }
 
 function initCatalog() {
+  const persisted = loadPersistedResults();
+  if (persisted) {
+    allResults = mergeCatalogWithPersisted(persisted.results);
+    refreshGrids();
+    if (hasCheckedResults(allResults)) {
+      updateSummary();
+      if (persisted.scanCompleted) {
+        startBtn.textContent = 'Проверить снова';
+        progressBar.style.width = '100%';
+        progressText.textContent = 'Результаты восстановлены';
+      }
+    }
+    return;
+  }
   allResults = buildCatalog();
   refreshGrids();
 }
@@ -286,6 +370,7 @@ async function recheckOne(url, region) {
   else allResults.push(updated);
 
   refreshGrids();
+  persistResults();
 
   if (!summaryEl.classList.contains('hidden')) {
     updateSummary();
@@ -509,6 +594,7 @@ async function runCheck() {
 
   scanInProgress = true;
   startBtn.textContent = 'Проверка...';
+  clearPersistedResults();
   allResults = buildCatalog();
   summaryEl.classList.add('hidden');
   progressBar.style.width = '0%';
@@ -534,6 +620,7 @@ async function runCheck() {
 
   reportResults(verifyData.sessionId, verifyData.geo, verifyData.network, summary).catch(() => {});
 
+  persistResults(true);
   scanInProgress = false;
   startBtn.disabled = false;
   startBtn.textContent = 'Проверить снова';
