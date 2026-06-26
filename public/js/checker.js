@@ -158,19 +158,20 @@ export async function checkAllServices(services, onProgress) {
 }
 
 export function summarizeResults(results) {
-  const ok = results.filter((r) => r.status === 'ok').length;
-  const blocked = results.filter((r) => r.status === 'blocked').length;
-  const latencies = results.filter((r) => r.status === 'ok' && r.latency != null).map((r) => r.latency);
+  const checked = results.filter((r) => r.status === 'ok' || r.status === 'blocked');
+  const ok = checked.filter((r) => r.status === 'ok').length;
+  const blocked = checked.filter((r) => r.status === 'blocked').length;
+  const latencies = checked.filter((r) => r.status === 'ok' && r.latency != null).map((r) => r.latency);
   const avgLatency = latencies.length
     ? Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length)
     : null;
 
-  const ru = results.filter((r) => r.region === 'ru');
-  const foreign = results.filter((r) => r.region === 'foreign');
+  const ru = checked.filter((r) => r.region === 'ru');
+  const foreign = checked.filter((r) => r.region === 'foreign');
   const ruOk = ru.filter((r) => r.status === 'ok').length;
   const ruBlocked = ru.filter((r) => r.status === 'blocked').length;
   const foreignOk = foreign.filter((r) => r.status === 'ok').length;
   const foreignBlocked = foreign.filter((r) => r.status === 'blocked').length;
 
-  return { total: results.length, ok, blocked, avgLatency, ruOk, ruBlocked, foreignOk, foreignBlocked };
+  return { total: checked.length, ok, blocked, avgLatency, ruOk, ruBlocked, foreignOk, foreignBlocked };
 }

@@ -1,5 +1,5 @@
 import { RU_SERVICES, FOREIGN_SERVICES } from './services.js';
-import { checkAllServices, summarizeResults } from './checker.js';
+import { checkAllServices, checkService, summarizeResults } from './checker.js';
 import { verifyAccess, reportResults } from './api.js';
 
 const networkBanner = document.getElementById('network-banner');
@@ -19,6 +19,7 @@ let allResults = [];
 let currentTab = 'all';
 let verifyData = null;
 let lastConnectionKey = null;
+let scanInProgress = false;
 
 function connectionKey(data) {
   const t = data?.client?.type || '';
@@ -185,6 +186,10 @@ function buildCatalog() {
   ];
 }
 
+function findResultIndex(url, region) {
+  return allResults.findIndex((r) => r.url === url && r.region === region);
+}
+
 function mergeBatchResults(batch) {
   for (const result of batch) {
     const idx = allResults.findIndex((r) => r.url === result.url && r.region === result.region);
@@ -210,10 +215,29 @@ function createCard(result) {
   card.dataset.name = result.name.toLowerCase();
   card.dataset.status = result.status;
   card.dataset.category = result.category.toLowerCase();
+  card.dataset.url = result.url;
+  card.dataset.region = result.region;
 
-  const statusLabels = { ok: 'Отвечает', blocked: 'Нет ответа', pending: 'Не проверен' };
+  const statusLabels = {
+    ok: 'Отвечает',
+    blocked: 'Нет ответа',
+    pending: 'Не проверен',
+    checking: 'Проверка…',
+  };
   const statusText = statusLabels[result.status] || result.status;
-  const latencyText = result.status === 'pending' ? '—' : (result.latency != null ? result.latency + ' мс' : '—');
+  const latencyText =
+    result.status === 'pending' || result.status === 'checking'
+      ? '—'
+      : result.latency != null
+        ? result.latency + ' мс'
+        : '—';
+
+  const checkLabel =
+    result.status === 'checking'
+      ? 'Проверка…'
+      : result.status === 'pending'
+        ? 'Проверить'
+        : 'Перепроверить';
 
   card.innerHTML =
     '<div class="service-card__header">' +
@@ -223,9 +247,57 @@ function createCard(result) {
     '<div class="service-card__meta">' +
     '<span class="service-card__latency">' + latencyText + '</span>' +
     '</div>' +
-    '<a class="service-card__link" href="' + escapeHtml(result.url) + '" target="_blank" rel="noopener">Открыть →</a>';
+    '<div class="service-card__actions">' +
+    '<button type="button" class="service-card__check"' +
+    (result.status === 'checking' || scanInProgress ? ' disabled' : '') +
+    '>' + checkLabel + '</button>' +
+    '<a class="service-card__link" href="' + escapeHtml(result.url) + '" target="_blank" rel="noopener">Открыть →</a>' +
+    '</div>';
 
   return card;
+}
+
+async function recheckOne(url, region) {
+  if (scanInProgress) return;
+
+  const idx = findResultIndex(url, region);
+  if (idx < 0) return;
+
+  const current = allResults[idx];
+  if (current.status === 'checking') return;
+
+  if (!verifyData?.allowed) {
+    try {
+      const fresh = await refreshVerification();
+      if (!fresh?.allowed) return;
+    } catch {
+      return;
+    }
+  }
+
+  allResults[idx] = { ...current, status: 'checking', latency: null };
+  refreshGrids();
+
+  const result = await checkService({ ...current, region });
+  const updated = { ...result, region };
+
+  const newIdx = findResultIndex(url, region);
+  if (newIdx >= 0) allResults[newIdx] = updated;
+  else allResults.push(updated);
+
+  refreshGrids();
+
+  if (!summaryEl.classList.contains('hidden')) {
+    updateSummary();
+  }
+}
+
+function onGridClick(e) {
+  const btn = e.target.closest('.service-card__check');
+  if (!btn || btn.disabled) return;
+  const card = btn.closest('.service-card');
+  if (!card) return;
+  recheckOne(card.dataset.url, card.dataset.region);
 }
 
 function getCategoryOrder(region) {
@@ -256,14 +328,15 @@ function groupByCategory(results, region) {
     .filter((cat) => grouped.has(cat))
     .map((cat) => {
       const items = grouped.get(cat).sort((a, b) => {
-        const order = { ok: 0, blocked: 1, pending: 2 };
+        const order = { ok: 0, blocked: 1, checking: 2, pending: 3 };
         const diff = (order[a.status] ?? 9) - (order[b.status] ?? 9);
         if (diff !== 0) return diff;
         return a.name.localeCompare(b.name, 'ru');
       });
       const ok = items.filter((i) => i.status === 'ok').length;
       const pending = items.filter((i) => i.status === 'pending').length;
-      return { category: cat, items, ok, pending, total: items.length };
+      const checking = items.filter((i) => i.status === 'checking').length;
+      return { category: cat, items, ok, pending, checking, total: items.length };
     });
 }
 
@@ -296,7 +369,7 @@ function renderGroupedResults(results, container, region) {
       details.open = true;
     }
 
-    const blocked = group.total - group.ok - group.pending;
+    const blocked = group.total - group.ok - group.pending - group.checking;
     const summary = document.createElement('summary');
     summary.className = 'category-summary';
 
@@ -311,6 +384,7 @@ function renderGroupedResults(results, container, region) {
         '<span class="category-summary__sep">из</span>' +
         '<span class="category-summary__total">' + group.total + '</span>' +
         (blocked > 0 ? '<span class="category-summary__blocked"> · ' + blocked + ' без ответа</span>' : '') +
+        (group.checking > 0 ? '<span class="category-summary__pending"> · ' + group.checking + ' проверяется</span>' : '') +
         (group.pending > 0 ? '<span class="category-summary__pending"> · ' + group.pending + ' не проверено</span>' : '');
     }
 
@@ -320,6 +394,18 @@ function renderGroupedResults(results, container, region) {
 
     const body = document.createElement('div');
     body.className = 'category-body';
+
+    if (group.checking > 0) {
+      const checkingSection = document.createElement('div');
+      checkingSection.className = 'category-subsection';
+      checkingSection.innerHTML =
+        '<div class="category-subsection__title category-subsection__title--checking">⟳ Проверяются (' + group.checking + ')</div>';
+      const checkingGrid = document.createElement('div');
+      checkingGrid.className = 'grid';
+      group.items.filter((i) => i.status === 'checking').forEach((r) => checkingGrid.appendChild(createCard(r)));
+      checkingSection.appendChild(checkingGrid);
+      body.appendChild(checkingSection);
+    }
 
     if (group.pending > 0) {
       const pendingSection = document.createElement('div');
@@ -421,6 +507,7 @@ async function runCheck() {
     return;
   }
 
+  scanInProgress = true;
   startBtn.textContent = 'Проверка...';
   allResults = buildCatalog();
   summaryEl.classList.add('hidden');
@@ -447,6 +534,7 @@ async function runCheck() {
 
   reportResults(verifyData.sessionId, verifyData.geo, verifyData.network, summary).catch(() => {});
 
+  scanInProgress = false;
   startBtn.disabled = false;
   startBtn.textContent = 'Проверить снова';
   progressText.textContent = 'Готово · результат сохранён для статистики';
@@ -470,6 +558,8 @@ tabButtons.forEach((btn) => {
 
 filterInput.addEventListener('input', refreshGrids);
 filterStatus.addEventListener('change', refreshGrids);
+ruGrid.addEventListener('click', onGridClick);
+foreignGrid.addEventListener('click', onGridClick);
 startBtn.addEventListener('click', runCheck);
 
 const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
