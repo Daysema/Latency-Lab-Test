@@ -26,7 +26,7 @@ export const RU_SERVICES = [
   // Соцсети и мессенджеры
   { name: 'ВКонтакте', category: 'Соцсети', url: 'https://vk.com', checkUrl: 'https://vk.com/favicon.ico' },
   { name: 'Одноклассники', category: 'Соцсети', url: 'https://ok.ru', checkUrl: 'https://ok.ru/favicon.ico' },
-  { name: 'Дзен', category: 'Соцсети', url: 'https://dzen.ru', checkUrl: 'https://dzen.ru/favicon.ico' },
+  { name: 'Дзен', category: 'Соцсети', url: 'https://dzen.ru', checkUrl: 'https://dzen.ru/favicon.ico', checkUrls: ['https://dzen.ru/favicon.svg', 'https://dzen.ru/robots.txt'] },
   { name: 'Rutube', category: 'Соцсети', url: 'https://rutube.ru', checkUrl: 'https://rutube.ru/favicon.ico' },
   { name: 'Пикабу', category: 'Соцсети', url: 'https://pikabu.ru', checkUrl: 'https://pikabu.ru/favicon.ico' },
   { name: 'Telegram Web', category: 'Соцсети', url: 'https://web.telegram.org', checkUrl: 'https://web.telegram.org/favicon.ico' },
@@ -52,9 +52,9 @@ export const RU_SERVICES = [
   { name: 'Lamoda', category: 'Маркетплейсы', url: 'https://www.lamoda.ru', checkUrl: 'https://www.lamoda.ru/favicon.ico' },
   { name: 'AliExpress RU', category: 'Маркетплейсы', url: 'https://aliexpress.ru', checkUrl: 'https://aliexpress.ru/favicon.ico' },
   { name: 'Юла', category: 'Маркетплейсы', url: 'https://youla.ru', checkUrl: 'https://youla.ru/favicon.ico' },
-  { name: 'Ситилинк', category: 'Маркетплейсы', url: 'https://www.citilink.ru', checkUrl: 'https://www.citilink.ru/favicon.ico' },
+  { name: 'Ситилинк', category: 'Маркетплейсы', url: 'https://www.citilink.ru', checkUrl: 'https://www.citilink.ru/favicon.ico', checkUrls: ['https://www.citilink.ru/favicon.svg', 'https://www.citilink.ru/robots.txt'] },
   { name: 'DNS', category: 'Маркетплейсы', url: 'https://www.dns-shop.ru', checkUrl: 'https://www.dns-shop.ru/favicon.ico' },
-  { name: 'М.Видео', category: 'Маркетплейсы', url: 'https://www.mvideo.ru', checkUrl: 'https://www.mvideo.ru/favicon.ico' },
+  { name: 'М.Видео', category: 'Маркетплейсы', url: 'https://www.mvideo.ru', checkUrl: 'https://www.mvideo.ru/favicon.ico', checkUrls: ['https://www.mvideo.ru/favicon.svg', 'https://www.mvideo.ru/robots.txt'] },
 
   // Госуслуги и государство
   { name: 'Госуслуги', category: 'Госуслуги', url: 'https://www.gosuslugi.ru', checkUrl: 'https://www.gosuslugi.ru/favicon.ico' },

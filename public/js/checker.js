@@ -10,6 +10,31 @@ function uniqueUrls(urls) {
   });
 }
 
+function isImagePath(url) {
+  return /\.(ico|png|jpg|jpeg|gif|svg|webp)(\?|$)/i.test(url);
+}
+
+export function getProbeUrls(service) {
+  const urls = [];
+  if (service.checkUrls) urls.push(...service.checkUrls);
+  if (service.checkUrl) urls.push(service.checkUrl);
+
+  try {
+    const { origin } = new URL(service.url);
+    urls.push(
+      `${origin}/favicon.ico`,
+      `${origin}/favicon.png`,
+      `${origin}/favicon.svg`,
+      `${origin}/apple-touch-icon.png`,
+      `${origin}/robots.txt`,
+    );
+  } catch {
+    /* ignore */
+  }
+
+  return uniqueUrls(urls);
+}
+
 function probeFetch(url, timeout) {
   return new Promise((resolve) => {
     const start = performance.now();
@@ -19,7 +44,12 @@ function probeFetch(url, timeout) {
       resolve(null);
     }, timeout);
 
-    fetch(url, { mode: 'no-cors', cache: 'no-store', signal: controller.signal })
+    fetch(url, {
+      mode: 'no-cors',
+      cache: 'no-store',
+      referrerPolicy: 'no-referrer',
+      signal: controller.signal,
+    })
       .then(() => {
         clearTimeout(timer);
         resolve(Math.round(performance.now() - start));
@@ -37,6 +67,7 @@ function probeImage(url, timeout) {
     const timer = setTimeout(() => resolve(null), timeout);
 
     const img = new Image();
+    img.referrerPolicy = 'no-referrer';
     img.onload = () => {
       clearTimeout(timer);
       resolve(Math.round(performance.now() - start));
@@ -49,52 +80,68 @@ function probeImage(url, timeout) {
   });
 }
 
+function probeIframe(url, timeout) {
+  return new Promise((resolve) => {
+    const start = performance.now();
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden';
+    iframe.referrerPolicy = 'no-referrer';
+
+    let settled = false;
+    const finish = (ok) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      iframe.remove();
+      resolve(ok ? Math.round(performance.now() - start) : null);
+    };
+
+    const timer = setTimeout(() => finish(false), timeout);
+    iframe.onload = () => finish(true);
+    iframe.onerror = () => finish(false);
+    iframe.src = url;
+    document.body.appendChild(iframe);
+  });
+}
+
+function runStaticProbes(urls, timeout) {
+  const probes = urls.flatMap((url) => {
+    if (isImagePath(url)) return [probeImage(url, timeout)];
+    return [probeFetch(url, timeout), probeImage(url, timeout)];
+  });
+
+  return Promise.any(
+    probes.map((p) => p.then((ms) => (ms != null ? ms : Promise.reject()))),
+  );
+}
+
 /**
- * Проверяет доступность с устройства пользователя несколькими способами:
- * fetch(no-cors) к сайту и favicon. Успех — если хотя бы один ответил.
+ * Проверка с устройства: статические ресурсы (favicon, robots.txt),
+ * затем fallback через скрытый iframe на главную страницу.
  */
 export async function checkService(service) {
-  const start = performance.now();
-  const urls = uniqueUrls([service.url, service.checkUrl]);
   const timeout = CHECK_TIMEOUT_MS;
+  const staticUrls = getProbeUrls(service);
 
-  const probes = urls.flatMap((url) => [
-    probeFetch(url, timeout),
-    probeImage(url, timeout),
-  ]);
-
-  const results = await Promise.all(
-    probes.map((p) =>
-      p.then((latency) => (latency != null ? latency : Promise.reject())),
-    ),
-  ).catch(() => []);
-
-  // Promise.all with reject - wrong. Use Promise.any:
   let latency = null;
+
   try {
-    latency = await Promise.any(
-      probes.map((p) =>
-        p.then((ms) => (ms != null ? ms : Promise.reject(new Error('fail')))),
-      ),
-    );
+    latency = await runStaticProbes(staticUrls, timeout);
   } catch {
-    latency = null;
+    try {
+      latency = await probeIframe(service.url, Math.min(timeout, 6000));
+    } catch {
+      latency = null;
+    }
   }
 
   if (latency != null) {
     return { ...service, status: 'ok', latency };
   }
 
-  return {
-    ...service,
-    status: 'blocked',
-    latency: Math.round(performance.now() - start),
-  };
+  return { ...service, status: 'blocked', latency: null };
 }
 
-/**
- * Проверяет список сервисов с ограничением параллельности.
- */
 export async function checkAllServices(services, onProgress) {
   const results = [];
   let completed = 0;
