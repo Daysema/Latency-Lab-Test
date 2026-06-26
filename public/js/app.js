@@ -148,7 +148,9 @@ function initNetworkBanner(data) {
     networkBanner.className = 'banner banner--warn';
     let extra = '';
 
-    if (data.reason === 'security' && data.security) {
+    if (data.reason === 'geo' && data.geo) {
+      extra = '<br><small>Определён регион: ' + escapeHtml(formatRegion(data.geo)) + '</small>';
+    } else if (data.reason === 'security' && data.security) {
       const flags = [];
       if (data.security.vpn) flags.push('VPN');
       if (data.security.proxy) flags.push('прокси');
@@ -173,6 +175,7 @@ function initNetworkBanner(data) {
     }
 
     startBtn.disabled = true;
+    mainContent.classList.add('hidden');
   }
 }
 

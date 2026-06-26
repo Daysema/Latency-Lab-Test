@@ -113,9 +113,11 @@ export function resolveConnectionProfile(lookup, clientNetworkType) {
   };
 }
 
+const ALLOWED_COUNTRY = 'RU';
+
 /**
- * Разрешает проверку для любого типа сети (Wi-Fi, проводной, мобильный).
- * Блокирует только VPN, прокси, Tor и хостинг.
+ * Разрешает проверку только из России.
+ * Блокирует VPN, прокси, Tor, хостинг и подключения за пределами РФ.
  */
 export function evaluateAccess(lookup, clientNetworkType) {
   const reasons = [];
@@ -132,6 +134,17 @@ export function evaluateAccess(lookup, clientNetworkType) {
       allowed: false,
       reason: 'security',
       message: buildSecurityMessage(reasons),
+      connection: profile,
+      operator: profile.operator,
+    };
+  }
+
+  if (lookup.countryCode !== ALLOWED_COUNTRY) {
+    const location = [lookup.city, lookup.region, lookup.country].filter(Boolean).join(', ');
+    return {
+      allowed: false,
+      reason: 'geo',
+      message: `Проверка доступна только из России. Ваш IP определён как: ${location || 'за пределами РФ'}. Если вы в России — отключите VPN.`,
       connection: profile,
       operator: profile.operator,
     };
