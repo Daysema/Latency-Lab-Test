@@ -57,8 +57,7 @@ app.post('/api/verify', async (req, res) => {
         asn: lookup.asn,
         operator: access.operator,
         isp: lookup.isp,
-        mobileAsn: access.mobileAsn,
-        cellularClient: access.cellularClient,
+        connection: access.connection,
       },
       security: lookup.security,
     });

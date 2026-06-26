@@ -1,6 +1,6 @@
 /**
  * Тип подключения на стороне клиента (Network Information API).
- * Решение о доступе принимает сервер по ASN + VPN.
+ * Решение о доступе принимает сервер (блокируется только VPN/прокси).
  */
 export function getClientNetworkType() {
   const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;

@@ -87,10 +87,27 @@ body {
   line-height: 1.6;
 }
 
-.banner--ok {
+.banner--ok,
+.banner--mobile {
   background: var(--ok-bg);
   border: 1px solid rgba(52, 211, 153, 0.3);
-  color: var(--ok);
+  color: #a7f3d0;
+}
+
+.banner--wifi {
+  background: rgba(79, 140, 255, 0.12);
+  border: 1px solid rgba(79, 140, 255, 0.35);
+  color: #93c5fd;
+}
+
+.banner--wired {
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  color: #fde68a;
+}
+
+.banner small {
+  opacity: 0.85;
 }
 
 .banner--warn {

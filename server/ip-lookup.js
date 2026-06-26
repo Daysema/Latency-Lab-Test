@@ -45,14 +45,54 @@ export async function lookupIp(ip) {
 }
 
 /**
- * Решает, разрешена ли проверка для данного IP.
+ * Определяет тип подключения для отображения пользователю.
+ */
+export function resolveConnectionProfile(lookup, clientNetworkType) {
+  const mobileAsn = isMobileAsn(lookup.asn) || matchesMobileIsp(lookup.isp, lookup.asnOrg);
+  const cellularClient = clientNetworkType === 'cellular';
+  const provider = lookup.isp || lookup.asnOrg || 'неизвестный провайдер';
+
+  let kind;
+  let kindLabel;
+
+  if (clientNetworkType === 'cellular' || (mobileAsn && clientNetworkType !== 'wifi' && clientNetworkType !== 'ethernet')) {
+    kind = 'mobile';
+    kindLabel = 'Мобильная сеть';
+  } else if (clientNetworkType === 'wifi') {
+    kind = 'wifi';
+    kindLabel = 'Wi-Fi';
+  } else if (clientNetworkType === 'ethernet') {
+    kind = 'wired';
+    kindLabel = 'Проводной интернет';
+  } else if (mobileAsn) {
+    kind = 'mobile';
+    kindLabel = 'Мобильная сеть';
+  } else {
+    kind = 'wired';
+    kindLabel = 'Проводной интернет';
+  }
+
+  const operator = kind === 'mobile'
+    ? (getMobileAsnName(lookup.asn) || lookup.asnOrg || lookup.isp || provider)
+    : provider;
+
+  return {
+    kind,
+    kindLabel,
+    operator,
+    provider,
+    mobileAsn,
+    cellularClient,
+  };
+}
+
+/**
+ * Разрешает проверку для любого типа сети (Wi-Fi, проводной, мобильный).
+ * Блокирует только VPN, прокси, Tor и хостинг.
  */
 export function evaluateAccess(lookup, clientNetworkType) {
   const reasons = [];
-  const asn = lookup.asn;
-  const mobileAsn = isMobileAsn(asn);
-  const mobileIsp = matchesMobileIsp(lookup.isp, lookup.asnOrg);
-  const cellularClient = clientNetworkType === 'cellular';
+  const profile = resolveConnectionProfile(lookup, clientNetworkType);
 
   if (lookup.security.vpn) reasons.push('vpn');
   if (lookup.security.proxy) reasons.push('proxy');
@@ -65,34 +105,8 @@ export function evaluateAccess(lookup, clientNetworkType) {
       allowed: false,
       reason: 'security',
       message: buildSecurityMessage(reasons),
-      mobileAsn,
-      mobileIsp,
-      cellularClient,
-      operator: getMobileAsnName(asn) || lookup.asnOrg,
-    };
-  }
-
-  if (!mobileAsn && !mobileIsp) {
-    return {
-      allowed: false,
-      reason: 'asn',
-      message: `Ваш IP (AS${asn || '?'}, ${lookup.isp || lookup.asnOrg || 'неизвестно'}) не принадлежит мобильному оператору. Подключитесь к мобильной сети (4G/5G), отключите Wi-Fi и VPN.`,
-      mobileAsn: false,
-      mobileIsp: false,
-      cellularClient,
-      operator: lookup.asnOrg || lookup.isp,
-    };
-  }
-
-  if (!cellularClient && clientNetworkType !== 'unknown') {
-    return {
-      allowed: false,
-      reason: 'client_network',
-      message: 'Браузер сообщает, что вы не в сотовой сети. Отключите Wi-Fi, подключитесь к 4G/5G и обновите страницу.',
-      mobileAsn,
-      mobileIsp,
-      cellularClient: false,
-      operator: getMobileAsnName(asn) || lookup.asnOrg,
+      connection: profile,
+      operator: profile.operator,
     };
   }
 
@@ -100,10 +114,8 @@ export function evaluateAccess(lookup, clientNetworkType) {
     allowed: true,
     reason: null,
     message: null,
-    mobileAsn,
-    mobileIsp,
-    cellularClient,
-    operator: getMobileAsnName(asn) || lookup.asnOrg || lookup.isp,
+    connection: profile,
+    operator: profile.operator,
   };
 }
 
@@ -116,7 +128,7 @@ function buildSecurityMessage(flags) {
     relay: 'iCloud Relay / анонимайзер',
   };
   const detected = flags.map((f) => labels[f] || f).join(', ');
-  return `Обнаружено подключение через ${detected}. Отключите VPN/прокси и подключитесь напрямую к мобильной сети оператора.`;
+  return `Обнаружено подключение через ${detected}. Отключите VPN/прокси для точной проверки вашего реального провайдера.`;
 }
 
 export function getClientIp(req) {

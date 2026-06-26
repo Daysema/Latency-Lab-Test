@@ -25,31 +25,72 @@ function formatRegion(geo) {
   return parts.join(', ');
 }
 
+function buildConnectionBanner(data) {
+  const conn = data.network?.connection;
+  const regionText = formatRegion(data.geo);
+  const operator = escapeHtml(conn?.operator || data.network?.operator || '—');
+
+  if (!conn) {
+    return {
+      className: 'banner banner--ok',
+      html: '<strong>Проверка с вашего устройства</strong>',
+    };
+  }
+
+  if (conn.kind === 'mobile') {
+    return {
+      className: 'banner banner--mobile',
+      html:
+        '<strong>📱 Проверка производится с мобильной сети</strong><br>' +
+        'Оператор: <strong>' + operator + '</strong>' +
+        (regionText ? '<br>Регион: <strong>' + escapeHtml(regionText) + '</strong>' : ''),
+    };
+  }
+
+  if (conn.kind === 'wifi') {
+    return {
+      className: 'banner banner--wifi',
+      html:
+        '<strong>📶 Проверка производится через Wi-Fi</strong><br>' +
+        'Провайдер: <strong>' + operator + '</strong>' +
+        (regionText ? '<br>Регион: <strong>' + escapeHtml(regionText) + '</strong>' : ''),
+    };
+  }
+
+  return {
+    className: 'banner banner--wired',
+    html:
+      '<strong>🖥️ Проверка производится с проводного интернета</strong><br>' +
+      'Провайдер: <strong>' + operator + '</strong>' +
+      (regionText ? '<br>Регион: <strong>' + escapeHtml(regionText) + '</strong>' : ''),
+  };
+}
+
 function initNetworkBanner(data) {
   const client = data.client;
   let clientDetails = '';
 
   if (client) {
     const parts = [];
-    if (client.label) parts.push(client.label);
+    if (client.label && client.type !== 'unknown') parts.push(client.label);
     if (client.effectiveType) parts.push(client.effectiveType);
     if (client.downlink) parts.push('↓ ' + client.downlink + ' Мбит/с');
     if (parts.length) clientDetails = parts.join(' · ');
   }
 
   if (data.allowed) {
-    networkBanner.className = 'banner banner--ok';
-    networkBanner.innerHTML =
-      '<strong>✓ Доступ разрешён</strong> — проверка с вашего устройства' +
-      (clientDetails ? '<br><small>' + escapeHtml(clientDetails) + '</small>' : '');
+    const banner = buildConnectionBanner(data);
+    networkBanner.className = banner.className;
+    networkBanner.innerHTML = banner.html + (clientDetails ? '<br><small>' + escapeHtml(clientDetails) + '</small>' : '');
 
+    const conn = data.network?.connection;
     const regionText = formatRegion(data.geo);
-    const operator = data.network?.operator;
     regionInfo.className = 'region-info';
     regionInfo.classList.remove('hidden');
     regionInfo.innerHTML =
+      '<div class="region-info__item"><span class="region-info__label">Тип подключения</span><span class="region-info__value">' + escapeHtml(conn?.kindLabel || '—') + '</span></div>' +
+      '<div class="region-info__item"><span class="region-info__label">' + (conn?.kind === 'mobile' ? 'Оператор' : 'Провайдер') + '</span><span class="region-info__value">' + escapeHtml(data.network?.operator || '—') + '</span></div>' +
       '<div class="region-info__item"><span class="region-info__label">Регион</span><span class="region-info__value">' + escapeHtml(regionText || '—') + '</span></div>' +
-      '<div class="region-info__item"><span class="region-info__label">Оператор</span><span class="region-info__value">' + escapeHtml(operator || '—') + '</span></div>' +
       '<div class="region-info__item"><span class="region-info__label">ASN</span><span class="region-info__value">AS' + escapeHtml(String(data.network?.asn || '—')) + '</span></div>';
 
     mainContent.classList.remove('hidden');
@@ -58,10 +99,7 @@ function initNetworkBanner(data) {
     networkBanner.className = 'banner banner--warn';
     let extra = '';
 
-    if (data.reason === 'asn' && data.network) {
-      extra = '<br><small>ASN: AS' + escapeHtml(String(data.network.asn || '?')) +
-        ' · ' + escapeHtml(data.network.isp || data.network.operator || '') + '</small>';
-    } else if (data.reason === 'security' && data.security) {
+    if (data.reason === 'security' && data.security) {
       const flags = [];
       if (data.security.vpn) flags.push('VPN');
       if (data.security.proxy) flags.push('прокси');
@@ -74,7 +112,7 @@ function initNetworkBanner(data) {
 
     networkBanner.innerHTML =
       '<strong>⚠ Проверка недоступна</strong><br>' +
-      escapeHtml(data.message || 'Подключитесь к мобильной сети оператора без VPN.') +
+      escapeHtml(data.message || 'Отключите VPN/прокси для проверки.') +
       extra;
 
     if (data.geo) {
