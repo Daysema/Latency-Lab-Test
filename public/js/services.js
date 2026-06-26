@@ -151,6 +151,7 @@ export const FOREIGN_SERVICES = [
   { name: 'Snapchat', category: 'Соцсети', url: 'https://www.snapchat.com', checkUrl: 'https://www.snapchat.com/favicon.ico' },
 
   // Мессенджеры
+  { name: 'Telegram Web', category: 'Мессенджеры', url: 'https://web.telegram.org', checkUrl: 'https://web.telegram.org/favicon.ico' },
   { name: 'WhatsApp', category: 'Мессенджеры', url: 'https://web.whatsapp.com', checkUrl: 'https://web.whatsapp.com/favicon.ico' },
   { name: 'Discord', category: 'Мессенджеры', url: 'https://discord.com', checkUrl: 'https://discord.com/favicon.ico' },
   { name: 'Viber', category: 'Мессенджеры', url: 'https://www.viber.com', checkUrl: 'https://www.viber.com/favicon.ico' },
