@@ -46,43 +46,70 @@ export async function lookupIp(ip) {
 
 /**
  * Определяет тип подключения для отображения пользователю.
+ * Тип из браузера (wifi/cellular/ethernet) имеет приоритет над ASN.
  */
 export function resolveConnectionProfile(lookup, clientNetworkType) {
   const mobileAsn = isMobileAsn(lookup.asn) || matchesMobileIsp(lookup.isp, lookup.asnOrg);
-  const cellularClient = clientNetworkType === 'cellular';
   const provider = lookup.isp || lookup.asnOrg || 'неизвестный провайдер';
+  const mobileOperator = getMobileAsnName(lookup.asn) || lookup.asnOrg || lookup.isp || provider;
 
-  let kind;
-  let kindLabel;
+  const base = { provider, mobileAsn };
 
-  if (clientNetworkType === 'cellular' || (mobileAsn && clientNetworkType !== 'wifi' && clientNetworkType !== 'ethernet')) {
-    kind = 'mobile';
-    kindLabel = 'Мобильная сеть';
-  } else if (clientNetworkType === 'wifi') {
-    kind = 'wifi';
-    kindLabel = 'Wi-Fi';
-  } else if (clientNetworkType === 'ethernet') {
-    kind = 'wired';
-    kindLabel = 'Проводной интернет';
-  } else if (mobileAsn) {
-    kind = 'mobile';
-    kindLabel = 'Мобильная сеть';
-  } else {
-    kind = 'wired';
-    kindLabel = 'Проводной интернет';
+  if (clientNetworkType === 'wifi') {
+    return {
+      ...base,
+      kind: 'wifi',
+      kindLabel: 'Wi-Fi',
+      operator: provider,
+      cellularClient: false,
+    };
   }
 
-  const operator = kind === 'mobile'
-    ? (getMobileAsnName(lookup.asn) || lookup.asnOrg || lookup.isp || provider)
-    : provider;
+  if (clientNetworkType === 'ethernet') {
+    return {
+      ...base,
+      kind: 'wired',
+      kindLabel: 'Проводной интернет',
+      operator: provider,
+      cellularClient: false,
+    };
+  }
+
+  if (clientNetworkType === 'cellular') {
+    if (!mobileAsn) {
+      return {
+        ...base,
+        kind: 'wifi',
+        kindLabel: 'Wi-Fi',
+        operator: provider,
+        cellularClient: false,
+      };
+    }
+    return {
+      ...base,
+      kind: 'mobile',
+      kindLabel: 'Мобильная сеть',
+      operator: mobileOperator,
+      cellularClient: true,
+    };
+  }
+
+  if (mobileAsn) {
+    return {
+      ...base,
+      kind: 'mobile',
+      kindLabel: 'Мобильная сеть',
+      operator: mobileOperator,
+      cellularClient: false,
+    };
+  }
 
   return {
-    kind,
-    kindLabel,
-    operator,
-    provider,
-    mobileAsn,
-    cellularClient,
+    ...base,
+    kind: 'wired',
+    kindLabel: 'Проводной интернет',
+    operator: provider,
+    cellularClient: false,
   };
 }
 

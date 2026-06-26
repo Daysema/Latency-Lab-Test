@@ -18,6 +18,34 @@ const tabButtons = document.querySelectorAll('.tab-btn');
 let allResults = [];
 let currentTab = 'all';
 let verifyData = null;
+let lastConnectionKey = null;
+
+function connectionKey(data) {
+  const t = data?.client?.type || '';
+  const k = data?.network?.connection?.kind || '';
+  const op = data?.network?.operator || '';
+  return t + '|' + k + '|' + op;
+}
+
+async function refreshVerification() {
+  const data = await verifyAccess();
+  const key = connectionKey(data);
+  const changed = lastConnectionKey !== null && lastConnectionKey !== key;
+  lastConnectionKey = key;
+  verifyData = data;
+  initNetworkBanner(verifyData);
+
+  if (changed) {
+    allResults = [];
+    summaryEl.classList.add('hidden');
+    ruGrid.innerHTML = '';
+    foreignGrid.innerHTML = '';
+    progressBar.style.width = '0%';
+    progressText.textContent = 'Подключение изменилось — запустите проверку снова';
+  }
+
+  return data;
+}
 
 function formatRegion(geo) {
   if (!geo) return '';
@@ -315,9 +343,23 @@ function refreshGrids() {
 }
 
 async function runCheck() {
-  if (!verifyData?.allowed) return;
-
+  progressText.textContent = 'Проверяем подключение...';
   startBtn.disabled = true;
+
+  let fresh;
+  try {
+    fresh = await refreshVerification();
+  } catch {
+    progressText.textContent = 'Ошибка связи с сервером';
+    startBtn.disabled = false;
+    return;
+  }
+
+  if (!fresh?.allowed) {
+    startBtn.disabled = true;
+    return;
+  }
+
   startBtn.textContent = 'Проверка...';
   allResults = [];
   summaryEl.classList.add('hidden');
@@ -370,9 +412,20 @@ filterInput.addEventListener('input', refreshGrids);
 filterStatus.addEventListener('change', refreshGrids);
 startBtn.addEventListener('click', runCheck);
 
-if (navigator.connection) {
-  navigator.connection.addEventListener('change', () => location.reload());
+const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+if (conn) {
+  conn.addEventListener('change', () => {
+    refreshVerification().catch(() => {});
+  });
 }
+window.addEventListener('online', () => {
+  refreshVerification().catch(() => {});
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    refreshVerification().catch(() => {});
+  }
+});
 
 async function init() {
   networkBanner.className = 'banner banner--loading';
@@ -381,6 +434,7 @@ async function init() {
 
   try {
     verifyData = await verifyAccess();
+    lastConnectionKey = connectionKey(verifyData);
     initNetworkBanner(verifyData);
   } catch {
     networkBanner.className = 'banner banner--warn';

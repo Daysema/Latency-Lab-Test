@@ -5,6 +5,7 @@ export async function verifyAccess() {
   const res = await fetch('/api/verify', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
     body: JSON.stringify({ clientNetworkType: client.type }),
   });
 
