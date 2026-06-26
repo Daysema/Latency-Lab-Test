@@ -118,6 +118,6 @@ app.get('/api/stats', (_req, res) => {
   res.json({ totals, byRegion });
 });
 
-app.listen(PORT, () => {
-  console.log(`API listening on :${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`API listening on 0.0.0.0:${PORT}`);
 });
