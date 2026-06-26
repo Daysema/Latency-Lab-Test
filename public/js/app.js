@@ -36,12 +36,10 @@ async function refreshVerification() {
   initNetworkBanner(verifyData);
 
   if (changed) {
-    allResults = [];
     summaryEl.classList.add('hidden');
-    ruGrid.innerHTML = '';
-    foreignGrid.innerHTML = '';
     progressBar.style.width = '0%';
     progressText.textContent = 'Подключение изменилось — запустите проверку снова';
+    initCatalog();
   }
 
   return data;
@@ -144,6 +142,7 @@ function initNetworkBanner(data) {
 
     mainContent.classList.remove('hidden');
     startBtn.disabled = false;
+    initCatalog();
   } else {
     networkBanner.className = 'banner banner--warn';
     let extra = '';
@@ -179,6 +178,26 @@ function initNetworkBanner(data) {
   }
 }
 
+function buildCatalog() {
+  return [
+    ...RU_SERVICES.map((s) => ({ ...s, region: 'ru', status: 'pending', latency: null })),
+    ...FOREIGN_SERVICES.map((s) => ({ ...s, region: 'foreign', status: 'pending', latency: null })),
+  ];
+}
+
+function mergeBatchResults(batch) {
+  for (const result of batch) {
+    const idx = allResults.findIndex((r) => r.url === result.url && r.region === result.region);
+    if (idx >= 0) allResults[idx] = result;
+    else allResults.push(result);
+  }
+}
+
+function initCatalog() {
+  allResults = buildCatalog();
+  refreshGrids();
+}
+
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
@@ -192,8 +211,9 @@ function createCard(result) {
   card.dataset.status = result.status;
   card.dataset.category = result.category.toLowerCase();
 
-  const statusText = result.status === 'ok' ? 'Отвечает' : 'Нет ответа';
-  const latencyText = result.latency != null ? result.latency + ' мс' : '—';
+  const statusLabels = { ok: 'Отвечает', blocked: 'Нет ответа', pending: 'Не проверен' };
+  const statusText = statusLabels[result.status] || result.status;
+  const latencyText = result.status === 'pending' ? '—' : (result.latency != null ? result.latency + ' мс' : '—');
 
   card.innerHTML =
     '<div class="service-card__header">' +
@@ -236,11 +256,14 @@ function groupByCategory(results, region) {
     .filter((cat) => grouped.has(cat))
     .map((cat) => {
       const items = grouped.get(cat).sort((a, b) => {
-        if (a.status !== b.status) return a.status === 'ok' ? -1 : 1;
+        const order = { ok: 0, blocked: 1, pending: 2 };
+        const diff = (order[a.status] ?? 9) - (order[b.status] ?? 9);
+        if (diff !== 0) return diff;
         return a.name.localeCompare(b.name, 'ru');
       });
       const ok = items.filter((i) => i.status === 'ok').length;
-      return { category: cat, items, ok, total: items.length };
+      const pending = items.filter((i) => i.status === 'pending').length;
+      return { category: cat, items, ok, pending, total: items.length };
     });
 }
 
@@ -255,18 +278,11 @@ function getOpenCategories(container) {
 function renderGroupedResults(results, container, region) {
   const filtered = applyFilters(results);
   const openCategories = getOpenCategories(container);
-  const hasResults = filtered.length > 0;
-  const isScanning = startBtn.disabled && startBtn.textContent === 'Проверка...';
 
   container.innerHTML = '';
 
-  if (!hasResults && !isScanning) {
-    container.innerHTML = '<p class="category-empty">Нажмите «Начать проверку»</p>';
-    return 0;
-  }
-
-  if (!hasResults && isScanning) {
-    container.innerHTML = '<p class="category-empty">Сканирование...</p>';
+  if (filtered.length === 0) {
+    container.innerHTML = '<p class="category-empty">Ничего не найдено</p>';
     return 0;
   }
 
@@ -280,20 +296,41 @@ function renderGroupedResults(results, container, region) {
       details.open = true;
     }
 
-    const blocked = group.total - group.ok;
+    const blocked = group.total - group.ok - group.pending;
     const summary = document.createElement('summary');
     summary.className = 'category-summary';
+
+    let statsHtml;
+    if (group.pending === group.total) {
+      statsHtml =
+        '<span class="category-summary__total">' + group.total + '</span>' +
+        '<span class="category-summary__pending"> · ожидает проверки</span>';
+    } else {
+      statsHtml =
+        '<span class="category-summary__ok">' + group.ok + '</span>' +
+        '<span class="category-summary__sep">из</span>' +
+        '<span class="category-summary__total">' + group.total + '</span>' +
+        (blocked > 0 ? '<span class="category-summary__blocked"> · ' + blocked + ' без ответа</span>' : '') +
+        (group.pending > 0 ? '<span class="category-summary__pending"> · ' + group.pending + ' не проверено</span>' : '');
+    }
+
     summary.innerHTML =
       '<span class="category-summary__name">' + escapeHtml(group.category) + '</span>' +
-      '<span class="category-summary__stats">' +
-      '<span class="category-summary__ok">' + group.ok + '</span>' +
-      '<span class="category-summary__sep">из</span>' +
-      '<span class="category-summary__total">' + group.total + '</span>' +
-        (blocked > 0 ? '<span class="category-summary__blocked">· ' + blocked + ' без ответа</span>' : '') +
-      '</span>';
+      '<span class="category-summary__stats">' + statsHtml + '</span>';
 
     const body = document.createElement('div');
     body.className = 'category-body';
+
+    if (group.pending > 0) {
+      const pendingSection = document.createElement('div');
+      pendingSection.className = 'category-subsection';
+      pendingSection.innerHTML = '<div class="category-subsection__title category-subsection__title--pending">○ Не проверены (' + group.pending + ')</div>';
+      const pendingGrid = document.createElement('div');
+      pendingGrid.className = 'grid';
+      group.items.filter((i) => i.status === 'pending').forEach((r) => pendingGrid.appendChild(createCard(r)));
+      pendingSection.appendChild(pendingGrid);
+      body.appendChild(pendingSection);
+    }
 
     if (group.ok > 0) {
       const okSection = document.createElement('div');
@@ -385,12 +422,11 @@ async function runCheck() {
   }
 
   startBtn.textContent = 'Проверка...';
-  allResults = [];
+  allResults = buildCatalog();
   summaryEl.classList.add('hidden');
-  ruGrid.innerHTML = '';
-  foreignGrid.innerHTML = '';
   progressBar.style.width = '0%';
   progressText.textContent = 'Подготовка...';
+  refreshGrids();
 
   const ruTagged = RU_SERVICES.map((s) => ({ ...s, region: 'ru' }));
   const foreignTagged = FOREIGN_SERVICES.map((s) => ({ ...s, region: 'foreign' }));
@@ -398,7 +434,7 @@ async function runCheck() {
   const total = allServices.length;
 
   await checkAllServices(allServices, (completed, _total, batchResults) => {
-    allResults.push(...batchResults);
+    mergeBatchResults(batchResults);
     const pct = Math.round((completed / total) * 100);
     progressBar.style.width = pct + '%';
     progressText.textContent = 'Проверено ' + completed + ' из ' + total;
