@@ -353,6 +353,124 @@ body {
   gap: 0.75rem;
 }
 
+/* Category groups */
+.category-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.category-empty {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 1rem;
+  text-align: center;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+.category-details {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.category-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.category-summary::-webkit-details-marker {
+  display: none;
+}
+
+.category-summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 0.5rem;
+  color: var(--text-muted);
+  transition: transform 0.15s;
+}
+
+.category-details[open] > .category-summary::before {
+  transform: rotate(90deg);
+}
+
+.category-summary:hover {
+  background: var(--surface-2);
+}
+
+.category-summary__name {
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+.category-summary__stats {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.category-summary__ok {
+  color: var(--ok);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.category-summary__sep {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.category-summary__total {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.category-summary__blocked {
+  color: var(--blocked);
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+}
+
+.category-body {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.category-subsection {
+  margin-top: 0.875rem;
+}
+
+.category-subsection__title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.category-subsection__title--ok {
+  color: var(--ok);
+}
+
+.category-subsection__title--blocked {
+  color: var(--blocked);
+}
+
 /* Service card */
 .service-card {
   background: var(--surface);

@@ -111,7 +111,6 @@ function createCard(result) {
     '<span class="service-card__badge">' + statusText + '</span>' +
     '</div>' +
     '<div class="service-card__meta">' +
-    '<span class="service-card__category">' + escapeHtml(result.category) + '</span>' +
     '<span class="service-card__latency">' + latencyText + '</span>' +
     '</div>' +
     '<a class="service-card__link" href="' + escapeHtml(result.url) + '" target="_blank" rel="noopener">Открыть →</a>';
@@ -119,11 +118,126 @@ function createCard(result) {
   return card;
 }
 
-function renderResults(results, grid) {
-  grid.innerHTML = '';
+function getCategoryOrder(region) {
+  const source = region === 'ru' ? RU_SERVICES : FOREIGN_SERVICES;
+  const order = [];
+  const seen = new Set();
+  for (const s of source) {
+    if (!seen.has(s.category)) {
+      seen.add(s.category);
+      order.push(s.category);
+    }
+  }
+  return order;
+}
+
+function groupByCategory(results, region) {
+  const grouped = new Map();
+  for (const r of results) {
+    if (!grouped.has(r.category)) grouped.set(r.category, []);
+    grouped.get(r.category).push(r);
+  }
+
+  const order = getCategoryOrder(region);
+  const extra = [...grouped.keys()].filter((c) => !order.includes(c));
+  const categories = [...order, ...extra];
+
+  return categories
+    .filter((cat) => grouped.has(cat))
+    .map((cat) => {
+      const items = grouped.get(cat).sort((a, b) => {
+        if (a.status !== b.status) return a.status === 'ok' ? -1 : 1;
+        return a.name.localeCompare(b.name, 'ru');
+      });
+      const ok = items.filter((i) => i.status === 'ok').length;
+      return { category: cat, items, ok, total: items.length };
+    });
+}
+
+function getOpenCategories(container) {
+  const open = new Set();
+  container.querySelectorAll('details.category-details[open]').forEach((el) => {
+    if (el.dataset.category) open.add(el.dataset.category);
+  });
+  return open;
+}
+
+function renderGroupedResults(results, container, region) {
   const filtered = applyFilters(results);
-  filtered.forEach((r) => grid.appendChild(createCard(r)));
+  const openCategories = getOpenCategories(container);
+  const hasResults = filtered.length > 0;
+  const isScanning = startBtn.disabled && startBtn.textContent === 'Проверка...';
+
+  container.innerHTML = '';
+
+  if (!hasResults && !isScanning) {
+    container.innerHTML = '<p class="category-empty">Нажмите «Начать проверку»</p>';
+    return 0;
+  }
+
+  if (!hasResults && isScanning) {
+    container.innerHTML = '<p class="category-empty">Сканирование...</p>';
+    return 0;
+  }
+
+  const groups = groupByCategory(filtered, region);
+
+  for (const group of groups) {
+    const details = document.createElement('details');
+    details.className = 'category-details';
+    details.dataset.category = group.category;
+    if (openCategories.has(group.category)) {
+      details.open = true;
+    }
+
+    const blocked = group.total - group.ok;
+    const summary = document.createElement('summary');
+    summary.className = 'category-summary';
+    summary.innerHTML =
+      '<span class="category-summary__name">' + escapeHtml(group.category) + '</span>' +
+      '<span class="category-summary__stats">' +
+      '<span class="category-summary__ok">' + group.ok + '</span>' +
+      '<span class="category-summary__sep">из</span>' +
+      '<span class="category-summary__total">' + group.total + '</span>' +
+      (blocked > 0 ? '<span class="category-summary__blocked">· ' + blocked + ' недоступно</span>' : '') +
+      '</span>';
+
+    const body = document.createElement('div');
+    body.className = 'category-body';
+
+    if (group.ok > 0) {
+      const okSection = document.createElement('div');
+      okSection.className = 'category-subsection';
+      okSection.innerHTML = '<div class="category-subsection__title category-subsection__title--ok">✓ Доступны (' + group.ok + ')</div>';
+      const okGrid = document.createElement('div');
+      okGrid.className = 'grid';
+      group.items.filter((i) => i.status === 'ok').forEach((r) => okGrid.appendChild(createCard(r)));
+      okSection.appendChild(okGrid);
+      body.appendChild(okSection);
+    }
+
+    if (blocked > 0) {
+      const blockedSection = document.createElement('div');
+      blockedSection.className = 'category-subsection';
+      blockedSection.innerHTML = '<div class="category-subsection__title category-subsection__title--blocked">✗ Недоступны (' + blocked + ')</div>';
+      const blockedGrid = document.createElement('div');
+      blockedGrid.className = 'grid';
+      group.items.filter((i) => i.status === 'blocked').forEach((r) => blockedGrid.appendChild(createCard(r)));
+      blockedSection.appendChild(blockedGrid);
+      body.appendChild(blockedSection);
+    }
+
+    details.appendChild(summary);
+    details.appendChild(body);
+    container.appendChild(details);
+  }
+
   return filtered.length;
+}
+
+function renderResults(results, grid) {
+  const region = grid.id === 'ru-grid' ? 'ru' : 'foreign';
+  return renderGroupedResults(results, grid, region);
 }
 
 function applyFilters(results) {
@@ -184,11 +298,7 @@ async function runCheck() {
     const pct = Math.round((completed / total) * 100);
     progressBar.style.width = pct + '%';
     progressText.textContent = 'Проверено ' + completed + ' из ' + total;
-
-    batchResults.forEach((r) => {
-      const grid = r.region === 'ru' ? ruGrid : foreignGrid;
-      grid.appendChild(createCard(r));
-    });
+    refreshGrids();
   });
 
   const summary = summarizeResults(allResults);

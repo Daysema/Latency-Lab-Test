@@ -170,17 +170,13 @@ export const FOREIGN_SERVICES = [
   { name: 'Instagram', category: 'Соцсети', url: 'https://www.instagram.com', checkUrl: 'https://www.instagram.com/favicon.ico' },
   { name: 'X (Twitter)', category: 'Соцсети', url: 'https://x.com', checkUrl: 'https://x.com/favicon.ico' },
   { name: 'TikTok', category: 'Соцсети', url: 'https://www.tiktok.com', checkUrl: 'https://www.tiktok.com/favicon.ico' },
-  { name: 'LinkedIn', category: 'Соцсети', url: 'https://www.linkedin.com', checkUrl: 'https://www.linkedin.com/favicon.ico' },
   { name: 'Reddit', category: 'Соцсети', url: 'https://www.reddit.com', checkUrl: 'https://www.reddit.com/favicon.ico' },
-  { name: 'Pinterest', category: 'Соцсети', url: 'https://www.pinterest.com', checkUrl: 'https://www.pinterest.com/favicon.ico' },
   { name: 'Snapchat', category: 'Соцсети', url: 'https://www.snapchat.com', checkUrl: 'https://www.snapchat.com/favicon.ico' },
 
   // Мессенджеры
   { name: 'WhatsApp', category: 'Мессенджеры', url: 'https://web.whatsapp.com', checkUrl: 'https://web.whatsapp.com/favicon.ico' },
   { name: 'Discord', category: 'Мессенджеры', url: 'https://discord.com', checkUrl: 'https://discord.com/favicon.ico' },
-  { name: 'Signal', category: 'Мессенджеры', url: 'https://signal.org', checkUrl: 'https://signal.org/favicon.ico' },
   { name: 'Viber', category: 'Мессенджеры', url: 'https://www.viber.com', checkUrl: 'https://www.viber.com/favicon.ico' },
-  { name: 'Slack', category: 'Мессенджеры', url: 'https://slack.com', checkUrl: 'https://slack.com/favicon.ico' },
   { name: 'Zoom', category: 'Мессенджеры', url: 'https://zoom.us', checkUrl: 'https://zoom.us/favicon.ico' },
   { name: 'Microsoft Teams', category: 'Мессенджеры', url: 'https://teams.microsoft.com', checkUrl: 'https://teams.microsoft.com/favicon.ico' },
 
@@ -191,7 +187,6 @@ export const FOREIGN_SERVICES = [
   { name: 'Apple Music', category: 'Стриминг', url: 'https://music.apple.com', checkUrl: 'https://music.apple.com/favicon.ico' },
   { name: 'Disney+', category: 'Стриминг', url: 'https://www.disneyplus.com', checkUrl: 'https://www.disneyplus.com/favicon.ico' },
   { name: 'HBO Max', category: 'Стриминг', url: 'https://www.max.com', checkUrl: 'https://www.max.com/favicon.ico' },
-  { name: 'SoundCloud', category: 'Стриминг', url: 'https://soundcloud.com', checkUrl: 'https://soundcloud.com/favicon.ico' },
 
   // Технологии
   { name: 'Microsoft', category: 'Технологии', url: 'https://www.microsoft.com', checkUrl: 'https://www.microsoft.com/favicon.ico' },
@@ -235,8 +230,4 @@ export const FOREIGN_SERVICES = [
   { name: 'PlayStation', category: 'Игры', url: 'https://www.playstation.com', checkUrl: 'https://www.playstation.com/favicon.ico' },
   { name: 'Xbox', category: 'Игры', url: 'https://www.xbox.com', checkUrl: 'https://www.xbox.com/favicon.ico' },
   { name: 'Roblox', category: 'Игры', url: 'https://www.roblox.com', checkUrl: 'https://www.roblox.com/favicon.ico' },
-
-  // VPN (для проверки блокировки)
-  { name: 'NordVPN', category: 'VPN', url: 'https://nordvpn.com', checkUrl: 'https://nordvpn.com/favicon.ico' },
-  { name: 'ExpressVPN', category: 'VPN', url: 'https://www.expressvpn.com', checkUrl: 'https://www.expressvpn.com/favicon.ico' },
 ];
