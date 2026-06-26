@@ -1,0 +1,6 @@
+# Локальная разработка: сайт на http://localhost:8080
+# Скопируйте: cp docker-compose.override.example.yml docker-compose.override.yml
+services:
+  caddy:
+    ports:
+      - "8080:80"
