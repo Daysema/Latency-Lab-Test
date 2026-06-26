@@ -94,17 +94,38 @@ function buildConnectionBanner(data) {
   };
 }
 
+function formatClientDetails(client, connectionKind) {
+  if (!client) return '';
+
+  const parts = [];
+
+  if (connectionKind === 'wifi' && client.type === 'wifi') {
+    parts.push('Wi-Fi');
+  } else if (connectionKind === 'wired' && client.type === 'ethernet') {
+    parts.push('Ethernet');
+  } else if (connectionKind === 'mobile' && client.type === 'cellular') {
+  if (client.effectiveType) {
+      const speedMap = {
+        'slow-2g': 'скорость: низкая',
+        '2g': 'скорость: 2G',
+        '3g': 'скорость: 3G',
+        '4g': 'скорость: 4G/LTE',
+      };
+      parts.push(speedMap[client.effectiveType] || client.effectiveType);
+    }
+  }
+
+  if (client.downlink) {
+    parts.push('↓ ~' + client.downlink + ' Мбит/с');
+  }
+
+  return parts.join(' · ');
+}
+
 function initNetworkBanner(data) {
   const client = data.client;
-  let clientDetails = '';
-
-  if (client) {
-    const parts = [];
-    if (client.label && client.type !== 'unknown') parts.push(client.label);
-    if (client.effectiveType) parts.push(client.effectiveType);
-    if (client.downlink) parts.push('↓ ' + client.downlink + ' Мбит/с');
-    if (parts.length) clientDetails = parts.join(' · ');
-  }
+  const connectionKind = data.network?.connection?.kind;
+  const clientDetails = formatClientDetails(client, connectionKind);
 
   if (data.allowed) {
     const banner = buildConnectionBanner(data);
