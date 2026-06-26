@@ -29,7 +29,6 @@ export const RU_SERVICES = [
   { name: 'Дзен', category: 'Соцсети', url: 'https://dzen.ru', checkUrl: 'https://dzen.ru/favicon.ico', checkUrls: ['https://dzen.ru/favicon.svg', 'https://dzen.ru/robots.txt'] },
   { name: 'Rutube', category: 'Соцсети', url: 'https://rutube.ru', checkUrl: 'https://rutube.ru/favicon.ico' },
   { name: 'Пикабу', category: 'Соцсети', url: 'https://pikabu.ru', checkUrl: 'https://pikabu.ru/favicon.ico' },
-  { name: 'Telegram Web', category: 'Соцсети', url: 'https://web.telegram.org', checkUrl: 'https://web.telegram.org/favicon.ico' },
   { name: 'TenChat', category: 'Соцсети', url: 'https://tenchat.ru', checkUrl: 'https://tenchat.ru/favicon.ico' },
 
   // Яндекс
