@@ -43,6 +43,9 @@ export const RU_SERVICES = [
   { name: 'Яндекс Погода', category: 'Яндекс', url: 'https://yandex.ru/pogoda', checkUrl: 'https://yandex.ru/favicon.ico' },
   { name: 'Яндекс Облако', category: 'Яндекс', url: 'https://cloud.yandex.ru', checkUrl: 'https://cloud.yandex.ru/favicon.ico' },
 
+  // Почта
+  { name: 'Rambler', category: 'Почта', url: 'https://mail.rambler.ru', checkUrl: 'https://mail.rambler.ru/favicon.ico' },
+
   // Маркетплейсы
   { name: 'Wildberries', category: 'Маркетплейсы', url: 'https://www.wildberries.ru', checkUrl: 'https://www.wildberries.ru/favicon.ico' },
   { name: 'Ozon', category: 'Маркетплейсы', url: 'https://www.ozon.ru', checkUrl: 'https://www.ozon.ru/favicon.ico' },
@@ -180,6 +183,7 @@ export const FOREIGN_SERVICES = [
   // Почта
   { name: 'Gmail', category: 'Почта', url: 'https://mail.google.com', checkUrl: 'https://mail.google.com/favicon.ico' },
   { name: 'Outlook', category: 'Почта', url: 'https://outlook.live.com', checkUrl: 'https://outlook.live.com/favicon.ico' },
+  { name: 'Tuta Mail', category: 'Почта', url: 'https://app.tuta.com', checkUrl: 'https://app.tuta.com/favicon.ico', checkUrls: ['https://tuta.com/favicon.ico'] },
 
   // Маркетплейсы
   { name: 'eBay', category: 'Маркетплейсы', url: 'https://www.ebay.com', checkUrl: 'https://www.ebay.com/favicon.ico' },
