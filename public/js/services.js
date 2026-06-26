@@ -10,7 +10,6 @@ export const RU_SERVICES = [
   { name: 'Газпромбанк', category: 'Банки', url: 'https://www.gazprombank.ru', checkUrl: 'https://www.gazprombank.ru/favicon.ico' },
   { name: 'Райффайзен', category: 'Банки', url: 'https://www.raiffeisen.ru', checkUrl: 'https://www.raiffeisen.ru/favicon.ico' },
   { name: 'Росбанк', category: 'Банки', url: 'https://www.rosbank.ru', checkUrl: 'https://www.rosbank.ru/favicon.ico' },
-  { name: 'Открытие', category: 'Банки', url: 'https://www.open.ru', checkUrl: 'https://www.open.ru/favicon.ico' },
   { name: 'Почта Банк', category: 'Банки', url: 'https://www.pochtabank.ru', checkUrl: 'https://www.pochtabank.ru/favicon.ico' },
   { name: 'МКБ', category: 'Банки', url: 'https://mkb.ru', checkUrl: 'https://mkb.ru/favicon.ico' },
   { name: 'Совкомбанк', category: 'Банки', url: 'https://sovcombank.ru', checkUrl: 'https://sovcombank.ru/favicon.ico' },
@@ -32,7 +31,6 @@ export const RU_SERVICES = [
   { name: 'Пикабу', category: 'Соцсети', url: 'https://pikabu.ru', checkUrl: 'https://pikabu.ru/favicon.ico' },
   { name: 'Telegram Web', category: 'Соцсети', url: 'https://web.telegram.org', checkUrl: 'https://web.telegram.org/favicon.ico' },
   { name: 'TenChat', category: 'Соцсети', url: 'https://tenchat.ru', checkUrl: 'https://tenchat.ru/favicon.ico' },
-  { name: 'ЯRUS', category: 'Соцсети', url: 'https://yarus.ru', checkUrl: 'https://yarus.ru/favicon.ico' },
 
   // Яндекс
   { name: 'Яндекс', category: 'Яндекс', url: 'https://ya.ru', checkUrl: 'https://ya.ru/favicon.ico' },
@@ -62,10 +60,7 @@ export const RU_SERVICES = [
   { name: 'Госуслуги', category: 'Госуслуги', url: 'https://www.gosuslugi.ru', checkUrl: 'https://www.gosuslugi.ru/favicon.ico' },
   { name: 'Налог.ру', category: 'Госуслуги', url: 'https://www.nalog.gov.ru', checkUrl: 'https://www.nalog.gov.ru/favicon.ico' },
   { name: 'ПФР', category: 'Госуслуги', url: 'https://pfr.gov.ru', checkUrl: 'https://pfr.gov.ru/favicon.ico' },
-  { name: 'Росреестр', category: 'Госуслуги', url: 'https://rosreestr.gov.ru', checkUrl: 'https://rosreestr.gov.ru/favicon.ico' },
   { name: 'МВД', category: 'Госуслуги', url: 'https://мвд.рф', checkUrl: 'https://мвд.рф/favicon.ico' },
-  { name: 'Кремль', category: 'Госуслуги', url: 'http://kremlin.ru', checkUrl: 'http://kremlin.ru/favicon.ico' },
-  { name: 'Госдума', category: 'Госуслуги', url: 'http://duma.gov.ru', checkUrl: 'http://duma.gov.ru/favicon.ico' },
 
   // Телеком
   { name: 'МТС', category: 'Телеком', url: 'https://mts.ru', checkUrl: 'https://mts.ru/favicon.ico' },
@@ -73,12 +68,6 @@ export const RU_SERVICES = [
   { name: 'МегаФон', category: 'Телеком', url: 'https://megafon.ru', checkUrl: 'https://megafon.ru/favicon.ico' },
   { name: 'Tele2', category: 'Телеком', url: 'https://tele2.ru', checkUrl: 'https://tele2.ru/favicon.ico' },
   { name: 'Ростелеком', category: 'Телеком', url: 'https://www.rt.ru', checkUrl: 'https://www.rt.ru/favicon.ico' },
-  { name: 'Дом.ру', category: 'Телеком', url: 'https://dom.ru', checkUrl: 'https://dom.ru/favicon.ico' },
-
-  // Почта и облака
-  { name: 'Mail.ru', category: 'Почта', url: 'https://mail.ru', checkUrl: 'https://mail.ru/favicon.ico' },
-  { name: 'Rambler', category: 'Почта', url: 'https://www.rambler.ru', checkUrl: 'https://www.rambler.ru/favicon.ico' },
-  { name: 'Облако Mail.ru', category: 'Почта', url: 'https://cloud.mail.ru', checkUrl: 'https://cloud.mail.ru/favicon.ico' },
 
   // Медиа и новости
   { name: 'РБК', category: 'Медиа', url: 'https://www.rbc.ru', checkUrl: 'https://www.rbc.ru/favicon.ico' },
@@ -98,21 +87,12 @@ export const RU_SERVICES = [
   { name: 'Wink', category: 'Медиа', url: 'https://wink.ru', checkUrl: 'https://wink.ru/favicon.ico' },
 
   // Транспорт и доставка
-  { name: 'РЖД', category: 'Транспорт', url: 'https://www.rzd.ru', checkUrl: 'https://www.rzd.ru/favicon.ico' },
   { name: 'Аэрофлот', category: 'Транспорт', url: 'https://www.aeroflot.ru', checkUrl: 'https://www.aeroflot.ru/favicon.ico' },
   { name: 'СДЭК', category: 'Транспорт', url: 'https://www.cdek.ru', checkUrl: 'https://www.cdek.ru/favicon.ico' },
   { name: 'Почта России', category: 'Транспорт', url: 'https://www.pochta.ru', checkUrl: 'https://www.pochta.ru/favicon.ico' },
   { name: 'Самокат', category: 'Транспорт', url: 'https://samokat.ru', checkUrl: 'https://samokat.ru/favicon.ico' },
   { name: 'Delivery Club', category: 'Транспорт', url: 'https://www.delivery-club.ru', checkUrl: 'https://www.delivery-club.ru/favicon.ico' },
-  { name: 'Ситимобил', category: 'Транспорт', url: 'https://city-mobil.ru', checkUrl: 'https://city-mobil.ru/favicon.ico' },
   { name: '2ГИС', category: 'Транспорт', url: 'https://2gis.ru', checkUrl: 'https://2gis.ru/favicon.ico' },
-
-  // Образование
-  { name: 'Учи.ру', category: 'Образование', url: 'https://uchi.ru', checkUrl: 'https://uchi.ru/favicon.ico' },
-  { name: 'Сферум', category: 'Образование', url: 'https://sferum.ru', checkUrl: 'https://sferum.ru/favicon.ico' },
-  { name: 'Stepik', category: 'Образование', url: 'https://stepik.org', checkUrl: 'https://stepik.org/favicon.ico' },
-  { name: 'Нетология', category: 'Образование', url: 'https://netology.ru', checkUrl: 'https://netology.ru/favicon.ico' },
-  { name: 'Skillbox', category: 'Образование', url: 'https://skillbox.ru', checkUrl: 'https://skillbox.ru/favicon.ico' },
 
   // IT и хостинг
   { name: 'VK Cloud', category: 'IT', url: 'https://cloud.vk.com', checkUrl: 'https://cloud.vk.com/favicon.ico' },
@@ -131,7 +111,6 @@ export const RU_SERVICES = [
   { name: 'ВкусВилл', category: 'Ритейл', url: 'https://vkusvill.ru', checkUrl: 'https://vkusvill.ru/favicon.ico' },
   { name: 'Додо Пицца', category: 'Ритейл', url: 'https://dodopizza.ru', checkUrl: 'https://dodopizza.ru/favicon.ico' },
   { name: 'KFC RU', category: 'Ритейл', url: 'https://www.kfc.ru', checkUrl: 'https://www.kfc.ru/favicon.ico' },
-  { name: 'Burger King RU', category: 'Ритейл', url: 'https://burgerking.ru', checkUrl: 'https://burgerking.ru/favicon.ico' },
   { name: 'Макдоналдс (Вкусно)', category: 'Ритейл', url: 'https://vkusnoitochka.ru', checkUrl: 'https://vkusnoitochka.ru/favicon.ico' },
 
   // Недвижимость
@@ -155,9 +134,7 @@ export const RU_SERVICES = [
   { name: 'Росгосстрах', category: 'Страхование', url: 'https://www.rgs.ru', checkUrl: 'https://www.rgs.ru/favicon.ico' },
   { name: 'АльфаСтрахование', category: 'Страхование', url: 'https://www.alfastrah.ru', checkUrl: 'https://www.alfastrah.ru/favicon.ico' },
 
-  // Крипто и финтех
-  { name: 'СБП', category: 'Финтех', url: 'https://sbp.nspk.ru', checkUrl: 'https://sbp.nspk.ru/favicon.ico' },
-  { name: 'НСПК', category: 'Финтех', url: 'https://nspk.ru', checkUrl: 'https://nspk.ru/favicon.ico' },
+  // Финтех
   { name: 'ЮMoney', category: 'Финтех', url: 'https://yoomoney.ru', checkUrl: 'https://yoomoney.ru/favicon.ico' },
   { name: 'QIWI', category: 'Финтех', url: 'https://qiwi.com', checkUrl: 'https://qiwi.com/favicon.ico' },
 ];
@@ -203,7 +180,6 @@ export const FOREIGN_SERVICES = [
   // Почта
   { name: 'Gmail', category: 'Почта', url: 'https://mail.google.com', checkUrl: 'https://mail.google.com/favicon.ico' },
   { name: 'Outlook', category: 'Почта', url: 'https://outlook.live.com', checkUrl: 'https://outlook.live.com/favicon.ico' },
-  { name: 'ProtonMail', category: 'Почта', url: 'https://proton.me', checkUrl: 'https://proton.me/favicon.ico' },
 
   // Маркетплейсы
   { name: 'eBay', category: 'Маркетплейсы', url: 'https://www.ebay.com', checkUrl: 'https://www.ebay.com/favicon.ico' },
