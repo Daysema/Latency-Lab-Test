@@ -192,7 +192,7 @@ function createCard(result) {
   card.dataset.status = result.status;
   card.dataset.category = result.category.toLowerCase();
 
-  const statusText = result.status === 'ok' ? 'Доступен' : 'Недоступен';
+  const statusText = result.status === 'ok' ? 'Отвечает' : 'Нет ответа';
   const latencyText = result.latency != null ? result.latency + ' мс' : '—';
 
   card.innerHTML =
@@ -289,7 +289,7 @@ function renderGroupedResults(results, container, region) {
       '<span class="category-summary__ok">' + group.ok + '</span>' +
       '<span class="category-summary__sep">из</span>' +
       '<span class="category-summary__total">' + group.total + '</span>' +
-      (blocked > 0 ? '<span class="category-summary__blocked">· ' + blocked + ' недоступно</span>' : '') +
+        (blocked > 0 ? '<span class="category-summary__blocked">· ' + blocked + ' без ответа</span>' : '') +
       '</span>';
 
     const body = document.createElement('div');
@@ -298,7 +298,7 @@ function renderGroupedResults(results, container, region) {
     if (group.ok > 0) {
       const okSection = document.createElement('div');
       okSection.className = 'category-subsection';
-      okSection.innerHTML = '<div class="category-subsection__title category-subsection__title--ok">✓ Доступны (' + group.ok + ')</div>';
+      okSection.innerHTML = '<div class="category-subsection__title category-subsection__title--ok">✓ Отвечают (' + group.ok + ')</div>';
       const okGrid = document.createElement('div');
       okGrid.className = 'grid';
       group.items.filter((i) => i.status === 'ok').forEach((r) => okGrid.appendChild(createCard(r)));
@@ -309,7 +309,7 @@ function renderGroupedResults(results, container, region) {
     if (blocked > 0) {
       const blockedSection = document.createElement('div');
       blockedSection.className = 'category-subsection';
-      blockedSection.innerHTML = '<div class="category-subsection__title category-subsection__title--blocked">✗ Недоступны (' + blocked + ')</div>';
+      blockedSection.innerHTML = '<div class="category-subsection__title category-subsection__title--blocked">✗ Нет ответа (' + blocked + ')</div>';
       const blockedGrid = document.createElement('div');
       blockedGrid.className = 'grid';
       group.items.filter((i) => i.status === 'blocked').forEach((r) => blockedGrid.appendChild(createCard(r)));
@@ -349,8 +349,8 @@ function updateSummary() {
   const totalSum = summarizeResults(allResults);
 
   summaryEl.innerHTML =
-    '<div class="stat"><span class="stat__value">' + totalSum.ok + '/' + totalSum.total + '</span><span class="stat__label">доступно</span></div>' +
-    '<div class="stat"><span class="stat__value stat__value--blocked">' + totalSum.blocked + '</span><span class="stat__label">недоступно</span></div>' +
+    '<div class="stat"><span class="stat__value">' + totalSum.ok + '/' + totalSum.total + '</span><span class="stat__label">отвечают</span></div>' +
+    '<div class="stat"><span class="stat__value stat__value--blocked">' + totalSum.blocked + '</span><span class="stat__label">без ответа</span></div>' +
     '<div class="stat"><span class="stat__value">' + (totalSum.avgLatency ?? '—') + '</span><span class="stat__label">ср. задержка, мс</span></div>' +
     '<div class="stat stat--split">' +
     '<span>🇷🇺 ' + ruSum.ok + '/' + ruSum.total + '</span>' +
