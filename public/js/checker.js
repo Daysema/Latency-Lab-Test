@@ -1,4 +1,4 @@
-const CHECK_TIMEOUT_MS = 8000;
+const CHECK_TIMEOUT_MS = 4000;
 const CONCURRENT_CHECKS = 6;
 
 function uniqueUrls(urls) {
@@ -129,7 +129,7 @@ export async function checkService(service) {
     latency = await runStaticProbes(staticUrls, timeout);
   } catch {
     try {
-      latency = await probeIframe(service.url, Math.min(timeout, 6000));
+      latency = await probeIframe(service.url, timeout);
     } catch {
       latency = null;
     }
