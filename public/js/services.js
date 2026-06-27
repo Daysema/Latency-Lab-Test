@@ -30,6 +30,7 @@ export const RU_SERVICES = [
   { name: 'Rutube', category: 'Соцсети', url: 'https://rutube.ru', checkUrl: 'https://rutube.ru/favicon.ico' },
   { name: 'Пикабу', category: 'Соцсети', url: 'https://pikabu.ru', checkUrl: 'https://pikabu.ru/favicon.ico' },
   { name: 'TenChat', category: 'Соцсети', url: 'https://tenchat.ru', checkUrl: 'https://tenchat.ru/favicon.ico' },
+  { name: 'Max', category: 'Соцсети', url: 'https://max.ru', checkUrl: 'https://max.ru/favicon.ico' },
 
   // Яндекс
   { name: 'Яндекс', category: 'Яндекс', url: 'https://ya.ru', checkUrl: 'https://ya.ru/favicon.ico' },
@@ -70,6 +71,7 @@ export const RU_SERVICES = [
   { name: 'МегаФон', category: 'Телеком', url: 'https://megafon.ru', checkUrl: 'https://megafon.ru/favicon.ico' },
   { name: 'Tele2', category: 'Телеком', url: 'https://tele2.ru', checkUrl: 'https://tele2.ru/favicon.ico' },
   { name: 'Ростелеком', category: 'Телеком', url: 'https://www.rt.ru', checkUrl: 'https://www.rt.ru/favicon.ico' },
+  { name: 'Yota', category: 'Телеком', url: 'https://www.yota.ru', checkUrl: 'https://www.yota.ru/favicon.ico' },
 
   // Медиа и новости
   { name: 'РБК', category: 'Медиа', url: 'https://www.rbc.ru', checkUrl: 'https://www.rbc.ru/favicon.ico' },
@@ -87,6 +89,8 @@ export const RU_SERVICES = [
   { name: 'Иви', category: 'Медиа', url: 'https://www.ivi.ru', checkUrl: 'https://www.ivi.ru/favicon.ico' },
   { name: 'Premier', category: 'Медиа', url: 'https://premier.one', checkUrl: 'https://premier.one/favicon.ico' },
   { name: 'Wink', category: 'Медиа', url: 'https://wink.ru', checkUrl: 'https://wink.ru/favicon.ico' },
+  { name: 'Okko', category: 'Медиа', url: 'https://okko.tv', checkUrl: 'https://okko.tv/favicon.ico' },
+  { name: 'Kion', category: 'Медиа', url: 'https://kion.ru', checkUrl: 'https://kion.ru/favicon.ico' },
 
   // Транспорт и доставка
   { name: 'Аэрофлот', category: 'Транспорт', url: 'https://www.aeroflot.ru', checkUrl: 'https://www.aeroflot.ru/favicon.ico' },
@@ -95,6 +99,7 @@ export const RU_SERVICES = [
   { name: 'Самокат', category: 'Транспорт', url: 'https://samokat.ru', checkUrl: 'https://samokat.ru/favicon.ico' },
   { name: 'Delivery Club', category: 'Транспорт', url: 'https://www.delivery-club.ru', checkUrl: 'https://www.delivery-club.ru/favicon.ico' },
   { name: '2ГИС', category: 'Транспорт', url: 'https://2gis.ru', checkUrl: 'https://2gis.ru/favicon.ico' },
+  { name: 'РЖД', category: 'Транспорт', url: 'https://www.rzd.ru', checkUrl: 'https://www.rzd.ru/favicon.ico' },
 
   // IT и хостинг
   { name: 'VK Cloud', category: 'IT', url: 'https://cloud.vk.com', checkUrl: 'https://cloud.vk.com/favicon.ico' },
@@ -114,6 +119,8 @@ export const RU_SERVICES = [
   { name: 'Додо Пицца', category: 'Ритейл', url: 'https://dodopizza.ru', checkUrl: 'https://dodopizza.ru/favicon.ico' },
   { name: 'KFC RU', category: 'Ритейл', url: 'https://www.kfc.ru', checkUrl: 'https://www.kfc.ru/favicon.ico' },
   { name: 'Макдоналдс (Вкусно)', category: 'Ритейл', url: 'https://vkusnoitochka.ru', checkUrl: 'https://vkusnoitochka.ru/favicon.ico' },
+  { name: 'Л\'Этуаль', category: 'Ритейл', url: 'https://www.letu.ru', checkUrl: 'https://www.letu.ru/favicon.ico' },
+  { name: 'Fix Price', category: 'Ритейл', url: 'https://fix-price.com', checkUrl: 'https://fix-price.com/favicon.ico' },
 
   // Недвижимость
   { name: 'ЦИАН', category: 'Недвижимость', url: 'https://www.cian.ru', checkUrl: 'https://www.cian.ru/favicon.ico' },
@@ -136,9 +143,13 @@ export const RU_SERVICES = [
   { name: 'Росгосстрах', category: 'Страхование', url: 'https://www.rgs.ru', checkUrl: 'https://www.rgs.ru/favicon.ico' },
   { name: 'АльфаСтрахование', category: 'Страхование', url: 'https://www.alfastrah.ru', checkUrl: 'https://www.alfastrah.ru/favicon.ico' },
 
+  // Здоровье
+  { name: 'Apteka.ru', category: 'Здоровье', url: 'https://apteka.ru', checkUrl: 'https://apteka.ru/favicon.ico' },
+
   // Финтех
   { name: 'ЮMoney', category: 'Финтех', url: 'https://yoomoney.ru', checkUrl: 'https://yoomoney.ru/favicon.ico' },
   { name: 'QIWI', category: 'Финтех', url: 'https://qiwi.com', checkUrl: 'https://qiwi.com/favicon.ico' },
+  { name: 'СБП', category: 'Финтех', url: 'https://sbp.nspk.ru', checkUrl: 'https://sbp.nspk.ru/favicon.ico' },
 ];
 
 export const FOREIGN_SERVICES = [
@@ -210,4 +221,10 @@ export const FOREIGN_SERVICES = [
   { name: 'PlayStation', category: 'Игры', url: 'https://www.playstation.com', checkUrl: 'https://www.playstation.com/favicon.ico' },
   { name: 'Xbox', category: 'Игры', url: 'https://www.xbox.com', checkUrl: 'https://www.xbox.com/favicon.ico' },
   { name: 'Roblox', category: 'Игры', url: 'https://www.roblox.com', checkUrl: 'https://www.roblox.com/favicon.ico' },
+
+  // Финтех
+  { name: 'PayPal', category: 'Финтех', url: 'https://www.paypal.com', checkUrl: 'https://www.paypal.com/favicon.ico' },
+
+  // Транспорт
+  { name: 'Uber', category: 'Транспорт', url: 'https://www.uber.com', checkUrl: 'https://www.uber.com/favicon.ico' },
 ];
