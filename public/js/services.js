@@ -163,6 +163,7 @@ export const RU_SERVICES = [
   { name: 'Windscribe', category: 'VPN', url: 'https://windscribe.com', checkUrl: 'https://windscribe.com/favicon.ico' },
   { name: 'CyberGhost', category: 'VPN', url: 'https://www.cyberghostvpn.com', checkUrl: 'https://www.cyberghostvpn.com/favicon.ico' },
   { name: 'ShadowqVPN', category: 'VPN', url: 'https://cab.shadowq.cc', checkUrl: 'https://cab.shadowq.cc/favicon.ico', checkUrls: ['https://cab.shadowq.cc/robots.txt'] },
+  { name: 'Echo Gate', category: 'VPN', url: 'https://echogate.site', checkUrl: 'https://echogate.site/favicon.ico', checkUrls: ['https://echogate.site/robots.txt'] },
 ];
 
 export const FOREIGN_SERVICES = [
