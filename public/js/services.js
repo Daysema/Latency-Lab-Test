@@ -150,6 +150,19 @@ export const RU_SERVICES = [
   { name: 'ЮMoney', category: 'Финтех', url: 'https://yoomoney.ru', checkUrl: 'https://yoomoney.ru/favicon.ico' },
   { name: 'QIWI', category: 'Финтех', url: 'https://qiwi.com', checkUrl: 'https://qiwi.com/favicon.ico' },
   { name: 'СБП', category: 'Финтех', url: 'https://sbp.nspk.ru', checkUrl: 'https://sbp.nspk.ru/favicon.ico' },
+
+  // VPN
+  { name: 'NordVPN', category: 'VPN', url: 'https://nordvpn.com', checkUrl: 'https://nordvpn.com/favicon.ico' },
+  { name: 'ExpressVPN', category: 'VPN', url: 'https://www.expressvpn.com', checkUrl: 'https://www.expressvpn.com/favicon.ico' },
+  { name: 'Proton VPN', category: 'VPN', url: 'https://protonvpn.com', checkUrl: 'https://protonvpn.com/favicon.ico' },
+  { name: 'Mullvad', category: 'VPN', url: 'https://mullvad.net', checkUrl: 'https://mullvad.net/favicon.ico' },
+  { name: 'Surfshark', category: 'VPN', url: 'https://surfshark.com', checkUrl: 'https://surfshark.com/favicon.ico' },
+  { name: 'AdGuard VPN', category: 'VPN', url: 'https://adguard-vpn.com', checkUrl: 'https://adguard-vpn.com/favicon.ico' },
+  { name: 'hidemy.name', category: 'VPN', url: 'https://hidemy.name', checkUrl: 'https://hidemy.name/favicon.ico' },
+  { name: 'VeePN', category: 'VPN', url: 'https://veepn.com', checkUrl: 'https://veepn.com/favicon.ico' },
+  { name: 'Windscribe', category: 'VPN', url: 'https://windscribe.com', checkUrl: 'https://windscribe.com/favicon.ico' },
+  { name: 'CyberGhost', category: 'VPN', url: 'https://www.cyberghostvpn.com', checkUrl: 'https://www.cyberghostvpn.com/favicon.ico' },
+  { name: 'ShadowqVPN', category: 'VPN', url: 'https://cab.shadowq.cc', checkUrl: 'https://cab.shadowq.cc/favicon.ico', checkUrls: ['https://cab.shadowq.cc/robots.txt'] },
 ];
 
 export const FOREIGN_SERVICES = [
